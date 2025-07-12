@@ -1,0 +1,129 @@
+# 24 marzo 2024
+#
+# ALGAL WORLD Aquaculture 1950 - 2021
+# regressione curve secondo grado
+#
+
+install.packages("readxl")
+install.packages("ggplot2")
+install.packages("dplyr")
+
+
+library(readxl)
+library(ggplot2)
+library(dplyr)
+
+
+
+        file_path <- "G:/Il mio Drive/ACQUACOLTURA/ARTICOLI DA SCRIVERE/2024/WORLD ALGAL AQUACULTURE 2024/Algae production AQUACULTURE VALUE 1984 - 2021 R.xlsx" 
+
+Algae_Value <- read_excel(file_path)
+
+#names(Algae_Value)
+
+
+yearly_data <- Algae_Value[, 5:ncol(Algae_Value)]
+
+
+# Calculate the total value for each year
+total_Value <- colSums(yearly_data, na.rm = TRUE)
+
+
+# Convert the totals to a data frame for better readability
+total_Value_df <- data.frame(Year = 1984:2021, Total_Value = total_Value)
+
+
+
+# Assuming the data has columns 'Year' and 'Production'
+# Replace 'Year' and 'Production' with the actual column names
+Algal_Value <- total_Value_df %>% 
+  select(Year, Total_Value) %>% 
+  filter(!is.na(Year), !is.na(Total_Value))
+
+
+
+Algal_Value$prod_Bil <- Algal_Value$Total_Value/1000000
+
+
+
+
+model_standard_poly <- lm(prod_Bil ~ Year + I(Year^2), data = Algal_Value)
+summary_model <- summary(model_standard_poly)
+r_squared <- round(summary_model$r.squared, 2)
+coefficients <- coef(model_standard_poly)
+
+
+
+equation_standard <- paste("y = ", round(coefficients[3], 2), "*x^2 + ",
+                          round(coefficients[2], 2), "*x + ", 
+                          round(coefficients[1], 2),
+                          "\nR² = ", r_squared, sep = "")
+
+
+
+
+
+
+ggplot(Algal_Value, aes(x = Year, y = prod_Bil)) +
+  geom_point() +
+  geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE, color = "blue") +
+  theme_minimal() +
+  labs(title = "Polynomial regression of world aquaculture algal economic value 1984 - 2021",
+       x = "Year",
+       y = "Value (Bil US$)") +
+  annotate("text", x = min(Algal_Value$Year), y = Inf, 
+           label = equation_standard, hjust = 0, vjust = 1.1, size = 5, color = "blue") +
+  theme(plot.title = element_text(size = 15))
+
+
+
+
+
+
+
+# Create a new data frame for the year you want to predict
+new_data <- data.frame(Year = 2010)
+
+# Predict the algal production for the year 2010
+predicted_production <- predict(model_algal_aquaculture, newdata = new_data)
+
+# Display the predicted value
+predicted_production
+
+
+
+
+Algal_Value <-  ggplot(Algal_Value, aes(x = Year, y = prod_Bil)) +
+                geom_point() +
+                geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE, color = "blue") +
+                theme_minimal() +
+                labs(title = "Polynomial regression of world aquaculture algal economic value 1984 - 2021",
+                    x = "Year",
+                    y = "Value (Bil US$)") +
+                annotate("text", x = min(Algal_Value$Year), y = Inf, 
+                label = equation_standard, hjust = 0, vjust = 1.1, size = 5, color = "blue") +
+                theme(plot.title = element_text(size = 15))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

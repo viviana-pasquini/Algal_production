@@ -1,0 +1,162 @@
+# 24 marzo 2024
+#
+# ALGAL WORLD Aquaculture 1950 - 2021
+# regressione curve secondo grado
+#
+
+install.packages("readxl")
+install.packages("ggplot2")
+install.packages("dplyr")
+install.packages("gridExtra")
+
+
+library(readxl)
+library(ggplot2)
+library(dplyr)
+library(gridExtra)
+
+
+        file_path2 <- "G:/Il mio Drive/ACQUACOLTURA/ARTICOLI DA SCRIVERE/2024/WORLD ALGAL AQUACULTURE 2024/Algae production FISHERY PPRODUCTIONS 1950 - 2021 - R.xlsx" 
+
+Algae_fishery <- read_excel(file_path2)
+
+
+
+#names(Algae_fishery)
+
+
+
+yearly_data_f <- Algae_fishery[, 5:ncol(Algae_fishery)]
+
+# Calculate the total production for each year
+total_production_f <- colSums(yearly_data_f, na.rm = TRUE)
+
+# Convert the totals to a data frame for better readability
+total_production_df_f <- data.frame(Year = 1950:2021, Total_Fishery = total_production_f)
+
+
+
+# Assuming the data has columns 'Year' and 'Production'
+# Replace 'Year' and 'Production' with the actual column names
+Algal_fishery <- total_production_df_f %>% 
+  select(Year, Total_Fishery) %>% 
+  filter(!is.na(Year), !is.na(Total_Fishery))
+
+
+Algal_fishery$prod_Mln <- Algal_fishery$Total_Fishery/1000000
+
+
+
+# Fit a second-degree polynomial model
+model_algal_fishery <- lm(prod_Mln ~ Year + I(Year^2), data = Algal_fishery)
+
+#model_algal_fishery <- lm(prod_Mln ~ poly(Year, 2), data = Algal_fishery)
+
+
+
+
+
+# Summary of the model
+summary(model_algal_fishery)
+
+# Calculate coefficients and R-squared
+coefficients <- coef(model_algal_fishery)
+
+
+equation_standard <- paste("y = ", round(coefficients[3], 3), "*x^2 + ",
+                          round(coefficients[2], 2), "*x + ", 
+                          round(coefficients[1], 2),
+                          "\nR² = ", r_squared, sep = "")
+
+# Plot the data and the regression line with annotations
+ggplot(Algal_fishery, aes(x = Year, y = prod_Mln)) +
+  geom_point() +
+  geom_smooth(method = "lm", formula = y ~ poly(x, 2, raw = TRUE), se = TRUE, color = "blue") +
+  theme_minimal() +
+  labs(title = "Second-Degree Polynomial Regression of Fisheries algal Production",
+       x = "Year",
+       y = "Production (Mln tons)") +
+  annotate("text", x = min(Algal_fishery$Year), y = Inf, 
+           label = equation_standard, hjust = 0, vjust = 1.1, size = 5, color = "blue") +
+  theme(plot.title = element_text(size = 15))
+ 
+
+
+# Create a new data frame for the year you want to predict
+new_data <- data.frame(Year = 2000)
+
+# Predict the algal FISHERY for the year 2000
+predicted_production <- predict(model_algal_fishery, newdata = new_data)
+
+# Display the predicted value
+predicted_production
+
+
+
+
+Algal_fishery <- ggplot(Algal_fishery, aes(x = Year, y = prod_Mln)) +
+                 geom_point() +
+                 geom_smooth(method = "lm", formula = y ~ poly(x, 2, raw = TRUE), se = TRUE, color = "blue") +
+                 theme_minimal() +
+                 labs(title = "Second-Degree Polynomial Regression of Fisheries algal Production",
+                      x = "Year",
+                      y = "Production (Mln tons)") +
+                 annotate("text", x = min(Algal_fishery$Year), y = Inf, 
+                 label = equation_standard, hjust = 0, vjust = 1.1, size = 5, color = "blue") +
+                 theme(plot.title = element_text(size = 15))
+ 
+
+
+grid.arrange(Algal_fishery , Algal_production)
+
+
+
+
+
+Algal_fishery <- ggplot(Algal_fishery, aes(x = Year, y = prod_Mln)) +
+                 geom_point() +
+                 geom_smooth(method = "lm", formula = y ~ poly(x, 2, raw = TRUE), se = TRUE, color = "blue") +
+                 theme_minimal() +
+                 labs(title = "Second-Degree Polynomial Regression of Fisheries algal Production",
+                      x = "Year",
+                      y = "Production (Mln tons)") +
+                 annotate("text", x = min(Algal_fishery$Year), y = Inf, 
+                 label = equation_standard, hjust = 0, vjust = 1.1, size = 5, color = "blue") +
+                 theme(plot.title = element_text(size = 15))
+
+
+
+Algal_production <-  ggplot(Algal_productions, aes(x = Year, y = prod_Mln)) +
+                     geom_point() +
+                     geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE, color = "blue") +
+                     theme_minimal() +
+                     labs(title = "Polynomial regression of world aquaculture algal production",
+                          x = "Year",
+                          y = "Production (Mln tons)") +
+                     annotate("text", x = min(Algal_productions$Year), y = Inf, 
+                     label = equation_standard, hjust = 0, vjust = 1.1, size = 5, color = "blue") +
+                     theme(plot.title = element_text(size = 15))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

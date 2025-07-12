@@ -1,0 +1,322 @@
+# 20 maggio 2024
+#
+# ALGAL WORLD Aquaculture 1950 - 2021
+# regressione curve secondo grado
+# divise per reddito: Country income
+#
+# FILES:
+#
+# Algae production LOW INCOME COUNTRIES 1950 - 2021  PRODUCTION  R.xlsx
+# Algae_production_High income R.xlsx
+# Algae_production_Upper middle income  R.xlsx
+# Algae_production_Lower middle income R.xlsx
+# 
+# 
+
+
+install.packages("readxl")
+install.packages("ggplot2")
+install.packages("dplyr")
+
+
+library(readxl)
+library(ggplot2)
+library(dplyr)
+
+
+
+              file_path_low <- "S:/Il mio Drive/ACQUACOLTURA/ARTICOLI DA SCRIVERE/2024/WORLD ALGAL AQUACULTURE 2024/Algae production LOW INCOME COUNTRIES 1950 - 2021  PRODUCTION  R.xlsx" 
+             file_path_high <- "S:/Il mio Drive/ACQUACOLTURA/ARTICOLI DA SCRIVERE/2024/WORLD ALGAL AQUACULTURE 2024/Algae_production_High income R.xlsx" 
+        file_path_up_middle <- "S:/Il mio Drive/ACQUACOLTURA/ARTICOLI DA SCRIVERE/2024/WORLD ALGAL AQUACULTURE 2024/Algae_production_Upper middle income  R.xlsx" 
+       file_path_low_middle <- "S:/Il mio Drive/ACQUACOLTURA/ARTICOLI DA SCRIVERE/2024/WORLD ALGAL AQUACULTURE 2024/Algae_production_Lower middle income R.xlsx" 
+
+       Algae_low <- read_excel(file_path_low)
+      Algae_high <- read_excel(file_path_high)
+ Algae_up_middle <- read_excel(file_path_up_middle)
+Algae_low_middle <- read_excel(file_path_low_middle)
+
+
+names(Algae_low)
+names(Algae_high)
+names(Algae_up_middle)
+names(Algae_low_middle)
+
+
+
+# seleziono soltanto le colonne con gli anni da 1950 a 2022, escludendo le prime sei colonne
+        yearly_data_low <- Algae_low[, 6:ncol(Algae_low)]
+       yearly_data_high <- Algae_high[, 6:ncol(Algae_high)]
+  yearly_data_up_middle <- Algae_up_middle[, 5:ncol(Algae_up_middle)]
+ yearly_data_low_middle <- Algae_low_middle[, 5:ncol(Algae_low_middle)]
+
+
+
+
+# trasformo TIBBLE in numeric 
+
+       yearly_data_low <- yearly_data_low %>% mutate(across(everything(), ~ as.numeric(as.character(.))))
+      yearly_data_high <- yearly_data_high %>% mutate(across(everything(), ~ as.numeric(as.character(.))))
+ yearly_data_up_middle <- yearly_data_up_middle %>% mutate(across(everything(), ~ as.numeric(as.character(.))))
+yearly_data_low_middle <- yearly_data_low_middle %>% mutate(across(everything(), ~ as.numeric(as.character(.))))
+
+
+
+
+# Calculate the total value for each year
+
+       total_low <- colSums(yearly_data_low, na.rm = TRUE)
+      total_high <- colSums(yearly_data_high, na.rm = TRUE)
+ total_up_middle <- colSums(yearly_data_up_middle, na.rm = TRUE)
+total_low_middle <- colSums(yearly_data_low_middle, na.rm = TRUE)
+
+
+
+
+
+
+# Convert the totals to a data frame for better readability
+       total_low_df <- data.frame(Year = 1950:2022, Total_production = total_low)
+      total_high_df <- data.frame(Year = 1950:2022, Total_production = total_high)
+ total_up_middle_df <- data.frame(Year = 1950:2022, Total_production = total_up_middle)
+total_low_middle_df <- data.frame(Year = 1950:2022, Total_production = total_low_middle)
+
+
+
+
+############################################################################################################################
+# Assuming the data has columns 'Year' and 'Production'
+# Replace 'Year' and 'Production' with the actual column names
+
+Algae_low2 <- total_low_df %>% 
+  select(Year, Total_production) %>% 
+  filter(!is.na(Year), !is.na(Total_production))
+
+
+Algae_high2 <- total_high_df %>% 
+  select(Year, Total_production) %>% 
+  filter(!is.na(Year), !is.na(Total_production))
+
+
+Algae_up_middle2 <- total_up_middle_df %>% 
+  select(Year, Total_production) %>% 
+  filter(!is.na(Year), !is.na(Total_production))
+
+
+Algae_low_middle2 <- total_low_middle_df %>% 
+  select(Year, Total_production) %>% 
+  filter(!is.na(Year), !is.na(Total_production))
+
+
+############################################################################################################################
+#
+# EQUATION Algal_low
+#
+
+model_standard_poly_low <- lm(Total_production ~ Year + I(Year^2), data = Algae_low2)
+      summary_model_low <- summary(model_standard_poly_low)
+          r_squared_low <- round(summary_model_low$r.squared, 2)
+       coefficients_low <- coef(model_standard_poly_low)
+
+
+
+equation_standard_low <- paste("y = ", round(coefficients_low[3], 2), "*x^2 + ",
+                          round(coefficients_low[2], 2), "*x + ", 
+                          round(coefficients_low[1], 2),
+                          "        R² = ", r_squared_low, sep = "")
+
+############################################################################################################################
+
+
+
+############################################################################################################################
+#
+# EQUATION Algae_high
+#
+
+model_standard_poly_high <- lm(Total_production ~ Year + I(Year^2), data = Algae_high2)
+      summary_model_high <- summary(model_standard_poly_high)
+          r_squared_high <- round(summary_model_high$r.squared, 2)
+       coefficients_high <- coef(model_standard_poly_high)
+
+
+
+equation_standard_high <- paste("y = ", round(coefficients_high[3], 2), "*x^2 + ",
+                          round(coefficients_high[2], 2), "*x + ", 
+                          round(coefficients_high[1], 2),
+                          "        R² = ", r_squared_high, sep = "")
+
+
+############################################################################################################################
+#
+# EQUATION Algae_up_middle
+#
+
+model_standard_poly_up_middle <- lm(Total_production ~ Year + I(Year^2), data = Algae_up_middle2)
+      summary_model_up_middle <- summary(model_standard_poly_up_middle)
+          r_squared_up_middle <- round(summary_model_up_middle$r.squared, 2)
+       coefficients_up_middle <- coef(model_standard_poly_up_middle)
+
+
+
+equation_standard_up_middle <- paste("y = ", round(coefficients_up_middle[3], 2), "*x^2 + ",
+                               round(coefficients_up_middle[2], 2), "*x + ", 
+                               round(coefficients_up_middle[1], 2),
+                               "        R² = ", r_squared_up_middle, sep = "")
+
+
+############################################################################################################################
+#
+# EQUATION Algae_low_middle
+#
+
+model_standard_poly_low_middle <- lm(Total_production ~ Year + I(Year^2), data = Algae_low_middle2)
+      summary_model_low_middle <- summary(model_standard_poly_low_middle)
+          r_squared_low_middle <- round(summary_model_low_middle$r.squared, 2)
+       coefficients_low_middle <- coef(model_standard_poly_low_middle)
+
+
+equation_standard_low_middle <- paste("y = ", round(coefficients_low_middle[3], 2), "*x^2 + ",
+                               round(coefficients_low_middle[2], 2), "*x + ", 
+                               round(coefficients_low_middle[1], 2),
+                               "        R² = ", r_squared_low_middle, sep = "")
+
+############################################################################################################################
+#
+# Grafici
+#
+#
+
+############################################################################################################################
+# 
+# GRAFICO Algae_low
+#
+
+Algal_low_graphic <- 
+ggplot(Algae_low2, aes(x = Year, y = Total_production)) +
+  geom_point() +
+  geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE, color = "blue") +
+  theme_minimal() +
+  labs(title = "Polynomial regression of world aquaculture algal production 1950 - 2022 Low Income Countries",
+       x = "Year",
+       y = "Production (Tons)") +
+  annotate("text", x = min(Algae_low2$Year), y = Inf, 
+           label = equation_standard_low, hjust = 0, vjust = 1.1, size = 5, color = "blue") +
+  theme(plot.title = element_text(size = 15))
+
+
+############################################################################################################################
+#
+# GRAFICO Algae_high
+#
+
+Algal_high_graphic <- 
+ggplot(Algae_high2, aes(x = Year, y = Total_production)) +
+  geom_point() +
+  geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE, color = "blue") +
+  theme_minimal() +
+  labs(title = "Polynomial regression of world aquaculture algal production 1950 - 2022 High Income Countries",
+       x = "Year",
+       y = "Production (Tons)") +
+  annotate("text", x = min(Algae_high2$Year), y = Inf, 
+           label = equation_standard_high, hjust = 0, vjust = 1.1, size = 5, color = "blue") +
+  theme(plot.title = element_text(size = 15))
+
+
+############################################################################################################################
+#
+# GRAFICO Algae_up_middle
+#
+
+Algal_up_middle_graphic <- 
+ggplot(Algae_up_middle2, aes(x = Year, y = Total_production)) +
+  geom_point() +
+  geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE, color = "blue") +
+  theme_minimal() +
+  labs(title = "Polynomial regression of world aquaculture algal production 1950 - 2022 Up Middle Income Countries",
+       x = "Year",
+       y = "Production (Tons)") +
+  annotate("text", x = min(Algae_up_middle2$Year), y = Inf, 
+           label = equation_standard_up_middle, hjust = 0, vjust = 1.1, size = 5, color = "blue") +
+  theme(plot.title = element_text(size = 15))
+
+
+############################################################################################################################
+#
+# GRAFICO Algae_low_middle
+#
+
+Algal_low_middle_graphic <- 
+ggplot(Algae_low_middle2, aes(x = Year, y = Total_production)) +
+  geom_point() +
+  geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = TRUE, color = "blue") +
+  theme_minimal() +
+  labs(title = "Polynomial regression of world aquaculture algal production 1950 - 2022 Low Middle Income Countries",
+       x = "Year",
+       y = "Production (Tons)") +
+  annotate("text", x = min(Algae_low_middle2$Year), y = Inf, 
+           label = equation_standard_low_middle, hjust = 0, vjust = 1.1, size = 5, color = "blue") +
+  theme(plot.title = element_text(size = 15))
+
+############################################################################################################################
+#
+#  GRAFICI
+#
+
+Algal_low_graphic
+Algal_high_graphic
+Algal_up_middle_graphic 
+Algal_low_middle_graphic
+
+
+
+############################################################################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Create a new data frame for the year you want to predict
+new_data <- data.frame(Year = 2010)
+
+# Predict the algal production for the year 2010
+predicted_production <- predict(model_algal_aquaculture, newdata = new_data)
+
+# Display the predicted value
+predicted_production
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
